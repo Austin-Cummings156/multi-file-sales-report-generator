@@ -1,0 +1,8 @@
+date,product,quantity,unit_price
+2026-09-08,Widget A,2,12.50
+2026-09-08,Widget B,banana,25.00
+2026-09-09,Widget C,3,not_a_price
+2026-09-09,,4,7.25
+09/15/2026,Widget D,5,6.00
+2026-09-10,  Widget A  ,1,12.50
+2026-09-11,Widget E,2,9.99
