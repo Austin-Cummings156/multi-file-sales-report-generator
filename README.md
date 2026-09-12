@@ -68,7 +68,7 @@ multi-file-sales-report-generator/
 ├── input/
 │   ├── sales_week_1.csv
 │   └── sales_week_2.csv
-├── output/
+├── output/            # created automatically at runtime
 │   └── report.csv
 ├── test_data/
 │   ├── sales_error_test.csv

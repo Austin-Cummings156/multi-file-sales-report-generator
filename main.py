@@ -43,6 +43,7 @@ def calculate_metrics(csv_files):
                     quantity = int(row["quantity"])
                     unit_price = float(row["unit_price"])
                     product = (row["product"] or "").strip()
+                    sale_date = date.fromisoformat(row["date"].strip())
 
                     if not product:
                         raise ValueError("Product name is empty.")
@@ -57,8 +58,6 @@ def calculate_metrics(csv_files):
                     else:
                         metrics["products"][product] = revenue
 
-                    sale_date = date.fromisoformat(row["date"].strip())
-
                     if metrics["start_date"] is None or sale_date < metrics["start_date"]:
                         metrics["start_date"] = sale_date
 
@@ -69,10 +68,11 @@ def calculate_metrics(csv_files):
                     print(f"Skipping invalid row: {row}")
                     continue
 
-    metrics["best_product"] = max(
-        metrics["products"],
-        key=lambda product_name: metrics["products"][product_name]
-    )
+    if metrics["products"]:
+        metrics["best_product"] = max(
+            metrics["products"],
+            key=lambda product_name: metrics["products"][product_name]
+        )
 
     return metrics
 

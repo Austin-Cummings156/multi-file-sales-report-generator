@@ -18,7 +18,6 @@ ENV/
 # Generated reports and output files
 report.csv
 output/
-output/
 
 # Local environment files
 .env
