@@ -12,19 +12,25 @@ REQUIRED_COLUMNS = {"date", "product", "quantity", "unit_price"}
 class Metrics(TypedDict):
     total_revenue: float
     total_sold: int
-    products: dict[str, float]
+    product_revenue: dict[str, float]
     best_product: str | None
     start_date: date | None
     end_date: date | None
 
-def find_csv_files():
+def find_csv_files() -> list[Path]:
+    """Return all CSV files in the input folder, sorted by filename."""
     return sorted(INPUT_FOLDER.glob("*.csv"))
 
-def calculate_metrics(csv_files):
+def calculate_metrics(csv_files: list[Path]) -> Metrics:
+    """Calculate sales metrics from the provided CSV files.
+
+    Files missing required columns and rows containing invalid data are
+    skipped rather than stopping the entire report.
+    """
     metrics: Metrics = {
         "total_revenue": 0.0,
         "total_sold": 0,
-        "products": {},
+        "product_revenue": {},
         "best_product": None,
         "start_date": None,
         "end_date": None
@@ -53,10 +59,10 @@ def calculate_metrics(csv_files):
                     metrics["total_revenue"] += revenue
                     metrics["total_sold"] += quantity
 
-                    if product in metrics["products"]:
-                        metrics["products"][product] += revenue
+                    if product in metrics["product_revenue"]:
+                        metrics["product_revenue"][product] += revenue
                     else:
-                        metrics["products"][product] = revenue
+                        metrics["product_revenue"][product] = revenue
 
                     if metrics["start_date"] is None or sale_date < metrics["start_date"]:
                         metrics["start_date"] = sale_date
@@ -68,16 +74,18 @@ def calculate_metrics(csv_files):
                     print(f"Skipping invalid row: {row}")
                     continue
 
-    if metrics["products"]:
+    # "Best product" is defined as the product with the highest total revenue.
+    if metrics["product_revenue"]:
         metrics["best_product"] = max(
-            metrics["products"],
-            key=lambda product_name: metrics["products"][product_name]
+            metrics["product_revenue"],
+            key=lambda product_name: metrics["product_revenue"][product_name]
         )
 
     return metrics
 
-def write_report(metrics: Metrics):
-    if not metrics["products"]:
+def write_report(metrics: Metrics) -> None:
+    """Write the calculated sales metrics to output/report.csv."""
+    if not metrics["product_revenue"]:
         print("No sales data found.")
         return
 
@@ -100,12 +108,12 @@ def write_report(metrics: Metrics):
         writer.writerow([])
         writer.writerow(["Product", "Revenue"])
 
-        for product, revenue in sorted(metrics["products"].items()):
+        for product, revenue in sorted(metrics["product_revenue"].items()):
             writer.writerow([product, f"{revenue:.2f}"])
 
     print("Report generated successfully.")
 
-def main():
+def main() -> None:
     csv_files = find_csv_files()
     if not csv_files:
         print("No csv files found in input folder.")
