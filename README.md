@@ -16,6 +16,8 @@ This program automatically discovers sales CSV files in an input directory, vali
 - Processes multiple files in one run
 - Validates required CSV headers before processing
 - Skips malformed or invalid rows without terminating the program
+- Reports the reason an invalid row was skipped
+- Rejects negative quantity and unit-price values
 - Calculates total revenue
 - Calculates total units sold
 - Calculates revenue by product
@@ -35,7 +37,7 @@ This program automatically discovers sales CSV files in an input directory, vali
 4. Valid files are processed row-by-row.
 5. Quantity and unit price values are converted to numeric types.
 6. Sale dates are parsed and used to determine the overall reporting timeframe.
-7. Invalid rows are skipped and reported in the console.
+7. Invalid rows are skipped and reported in the console with the reason for failure.
 8. Revenue is calculated for each valid sale.
 9. Overall and per-product metrics are accumulated across all valid input files.
 10. The highest-revenue product is determined after all files have been processed.
@@ -55,9 +57,9 @@ date,product,quantity,unit_price
 ### Required Columns
 
 - `date` — date of the sale in `YYYY-MM-DD` format
-- `product` — product name
-- `quantity` — number of units sold
-- `unit_price` — price of one unit
+- `product` — non-empty product name
+- `quantity` — whole-number units sold; negative values are rejected
+- `unit_price` — numeric price of one unit; negative values are rejected
 
 Product names do not need to be predefined in the program. New products are discovered automatically while the files are processed.
 
@@ -143,12 +145,14 @@ Examples of invalid data that are skipped include:
 
 - Non-numeric quantities
 - Invalid unit prices
+- Negative quantities
+- Negative unit prices
 - Empty product names
 - Invalid date formats
 
 Entire CSV files are skipped when they do not contain all required columns.
 
-Skipped rows and files are reported in the console so the user can identify problems in the source data.
+Skipped rows and files are reported in the console. For invalid rows, the reported message includes the reason the row could not be processed.
 
 ## Design Decisions
 
@@ -191,6 +195,8 @@ The current version assumes:
 - Input CSV files use UTF-8 encoding.
 - Dates use the `YYYY-MM-DD` format.
 - Quantity values represent whole-number units.
+- Zero quantity is allowed; negative quantity is rejected.
+- Unit prices must not be negative.
 - All sales use the same currency.
 - Revenue calculations use Python floating-point numbers.
 - All compatible CSV files in the input folder should be combined into one report.
@@ -205,22 +211,15 @@ The program was manually tested with:
 - New products appearing in later files
 - Invalid quantity values
 - Invalid unit prices
+- Negative quantity values
+- Negative unit prices
+- Zero quantity values
 - Empty product names
+- Product names with surrounding whitespace
 - Invalid date formats
 - CSV files missing required columns
 
 The program continues processing valid data while reporting invalid rows and incompatible files to the console.
-
-## Possible Future Improvements
-
-- Add automated tests with `pytest`
-- Write skipped rows and files to a dedicated error log
-- Allow configurable input and output directories
-- Support Excel files
-- Add additional product metrics
-- Add daily, weekly, or monthly sales summaries
-- Allow filtering by a requested date range
-- Use Python's `Decimal` type for currency-safe calculations
 
 ## What I Learned
 
@@ -230,8 +229,8 @@ This project provided practical experience with:
 - CSV parsing and generation
 - File handling
 - `pathlib`
-- Dictionaries and nested dictionaries
-- Typed dictionaries and type hints
+- Dictionaries and typed dictionaries
+- Type hints
 - Loops and conditionals
 - Type conversion
 - Date parsing and comparison
