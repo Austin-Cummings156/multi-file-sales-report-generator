@@ -6,3 +6,6 @@ date,product,quantity,unit_price
 09/15/2026,Widget D,5,6.00
 2026-09-10,  Widget A  ,1,12.50
 2026-09-11,Widget E,2,9.99
+2026-09-12,Widget F,-3,11.00
+2026-09-13,Widget G,4,-8.50
+2026-09-14,Widget H,0,15.00
