@@ -54,6 +54,9 @@ def calculate_metrics(csv_files: list[Path]) -> Metrics:
                     if not product:
                         raise ValueError("Product name is empty.")
 
+                    if quantity < 0 or unit_price < 0:
+                        raise ValueError("Quantity and unit price cannot be negative.")
+
                     revenue = quantity * unit_price
 
                     metrics["total_revenue"] += revenue
@@ -70,8 +73,8 @@ def calculate_metrics(csv_files: list[Path]) -> Metrics:
                     if metrics["end_date"] is None or sale_date > metrics["end_date"]:
                         metrics["end_date"] = sale_date
 
-                except (ValueError, TypeError, KeyError):
-                    print(f"Skipping invalid row: {row}")
+                except (ValueError, TypeError, KeyError) as error:
+                    print(f"Skipping invalid row: {row} ({error})")
                     continue
 
     # "Best product" is defined as the product with the highest total revenue.
